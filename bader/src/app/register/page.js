@@ -4,6 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { signIn } from "next-auth/react"; // ✅ تأكد من هذا السطر
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +22,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -32,43 +35,31 @@ export default function Register() {
           address: formData.address,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
-        alert(data.message || "فشل في إنشاء الحساب");
+        toast.error(data.message || "فشل في إنشاء الحساب");
       } else {
-        alert("🎉 تم إنشاء الحساب بنجاح");
-  
-        // Optional: redirect to login
-        window.location.href = '/login';
+        toast.warn(" تحقق من بريدك الإلكتروني لإدخال رمز التحقق");
+        sessionStorage.setItem('verificationEmail', formData.email);
+        setTimeout(() => {
+          window.location.href = '/EmailVerificationPage';
+        }, 2000);
       }
     } catch (error) {
       console.error("❌ Register Error:", error);
-      alert("حدث خطأ أثناء إنشاء الحساب");
+      toast.error("حدث خطأ أثناء إنشاء الحساب");
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log("Form submitted:", formData);
-  //   // Handle form submission logic here
-
-
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     console.log("Login submitted:", formData);
-  //     setLoading(false);
-  //     // Handle login logic here
-  //   }, 1500);
-  // };
-
+ 
   return (
     <div
       dir="rtl"
@@ -402,7 +393,7 @@ export default function Register() {
               أو سجل دخول باستخدام
             </span>
           </div>
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-3 px-4 transition-colors hover:bg-gray-50"
@@ -413,9 +404,25 @@ export default function Register() {
               className="w-5 h-5 mr-2"
             />
             <span> Google تسجيل الدخول باستخدام</span>
-          </motion.button>
+          </motion.button> */}
+          <motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  onClick={() => signIn("google", { callbackUrl: "/" })}
+  className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-2 px-4 transition-colors hover:bg-gray-50"
+>
+  <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    alt="Google logo"
+    className="w-5 h-5 mr-2"
+  />
+  <span>Google تسجيل الدخول باستخدام</span>
+</motion.button>
         </div>
       </motion.div>
+      <ToastContainer position="top-center" autoClose={3000} />
+
     </div>
+    
   );
 }

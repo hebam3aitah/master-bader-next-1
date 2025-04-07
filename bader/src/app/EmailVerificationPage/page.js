@@ -1,10 +1,11 @@
 // EmailVerificationPage.jsx
 'use client';
-// EmailVerificationPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Head from 'next/head';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function EmailVerificationPage() {
   const [email, setEmail] = useState('');
@@ -68,24 +69,46 @@ export default function EmailVerificationPage() {
     }
   };
   
-  // التحقق من رمز OTP
-  const verifyOtp = (e) => {
+ 
+  const verifyOtp = async (e) => {
     e.preventDefault();
     const otpValue = otp.join('');
     if (otpValue.length !== 4) {
       alert('الرجاء إدخال رمز التحقق المكون من 4 أرقام');
       return;
     }
+  
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: otpValue }),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        setVerificationStatus(false);
+        alert(data.message || 'فشل التحقق من الرمز');
+      } else {
+        setVerificationStatus(true);
+  
+        // ✅ عرض رسالة وفتح صفحة تسجيل الدخول بعد 3 ثواني
+        setTimeout(() => {
+          toast.success('🎉 تم إنشاء الحساب بنجاح! سيتم توجيهك لتسجيل الدخول...');
+('🎉 تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول');
+          window.location.href = '/login';
+        }, 3000);
+      }
+    } catch (err) {
+      console.error('OTP Verification Error:', err);
+      setVerificationStatus(false);
+      alert('حدث خطأ أثناء التحقق من الرمز');
+    }
+  
+  
     
-    // هنا يمكن إضافة منطق التحقق من الرمز مع الخادم
-    // هذا مجرد محاكاة للتحقق الناجح
-    setVerificationStatus(true);
-    
-    // في حالة النجاح، يمكن توجيه المستخدم إلى الصفحة التالية بعد 3 ثوانٍ
-    setTimeout(() => {
-      // يمكن استبدال هذا بالتوجيه إلى الصفحة المطلوبة
-      window.location.href = '/dashboard';
-    }, 3000);
+  
   };
   
   // إعادة إرسال رمز OTP
@@ -366,15 +389,7 @@ export default function EmailVerificationPage() {
           />
         </motion.div>
         
-        {/* رابط إضافي أسفل البطاقة */}
-        {/* <div className="mt-8 text-center text-sm">
-          <p className="text-gray-600">
-            لديك مشكلة في تأكيد البريد الإلكتروني؟{' '}
-            <Link href="/contact-support" className="font-medium text-[#31124b] hover:text-[#fa9e1b] transition-colors duration-300">
-              تواصل مع الدعم
-            </Link>
-          </p>
-        </div> */}
+     
       </div>
     </>
   );

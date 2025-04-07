@@ -3,6 +3,7 @@ import '../styles/globals.css';  // تأكد من استيراد الأنماط
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Inter } from 'next/font/google';
+import SessionWrapper from "@/app/components/SessionWrapper";
 
 const ibmPlexSansArabic = Inter({
   subsets: ['latin'],
@@ -20,10 +21,14 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body className="{`${ibmPlexSansArabic.variable} font-body`} bg-gray-100"> {/* تأكد من عدم وجود مسافات بيضاء بين هذه العلامات */}
+      <body className={`${ibmPlexSansArabic.variable} font-body bg-gray-100`}>
+      <SessionWrapper>
+
       <Navbar/>
       <main>{children}</main>
       <Footer />
+      </SessionWrapper>
+
     </body></html>
   );
 }

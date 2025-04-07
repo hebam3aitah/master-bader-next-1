@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { signIn } from "next-auth/react";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,18 +16,35 @@ export default function Login() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Login submitted:', formData);
+  
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        alert(data.message || 'فشل تسجيل الدخول');
+      } else {
+        alert('🎉 تم تسجيل الدخول بنجاح');
+        window.location.href = '/';
+ // أو أي صفحة رئيسية
+      }
+    } catch (error) {
+      console.error('Login Error:', error);
+      alert('حدث خطأ أثناء تسجيل الدخول');
+    } finally {
       setLoading(false);
-      // Handle login logic here
-    }, 1500);
+    }
   };
+  
+   
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4">
@@ -136,14 +154,7 @@ export default function Login() {
             ) : (
               <span>تسجيل الدخول</span>
             )}
-            {/* {!loading && (
-              <motion.span
-                initial={{ x: '-100%' }}
-                animate={{ x: '200%' }}
-                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                className="absolute top-0 bottom-0 left-0 w-20 h-full bg-white opacity-20 transform rotate-12"
-              />
-            )} */}
+    
           </motion.button>
         </form>
         
@@ -153,16 +164,32 @@ export default function Login() {
             <hr className="w-full border-gray-300" />
             <span className="absolute bg-white px-4 text-sm text-gray-500">أو سجل دخول باستخدام</span>
           </div>
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-2 px-4 transition-colors hover:bg-gray-50"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="w-5 h-5 mr-2" />
             <span>Google تسجيل الدخول باستخدام</span>
-          </motion.button>
+          </motion.button> */}
+
+<motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  onClick={() => signIn("google", { callbackUrl: "/" })}
+  className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-2 px-4 transition-colors hover:bg-gray-50"
+>
+  <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    alt="Google logo"
+    className="w-5 h-5 mr-2"
+  />
+  <span>Google تسجيل الدخول باستخدام</span>
+</motion.button>
+
         </div>
       </motion.div>
     </div>
   );
+
 }
