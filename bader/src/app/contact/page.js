@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+
 
 // Import the map component dynamically with no SSR to avoid window is not defined errors
 const Map = dynamic(
@@ -21,6 +24,7 @@ export default function Contact() {
   
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [floating, setFloating] = useState({});
+  const [loading, setLoading] = useState(false);
 
   // Animation for floating elements
   useEffect(() => {
@@ -37,18 +41,43 @@ export default function Contact() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
-  const handleSubmit = (e) => {
+  
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log('Form submitted:', formData);
-    setIsSubmitted(true);
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', message: '' });
-    }, 3000);
+    setLoading(true);
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error("يرجى تعبئة جميع الحقول المطلوبة.");
+      setLoading(false);
+      return;
+    }
+    try {
+      // Here you would typically send the data to your backend
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (data.success) {
+        setIsSubmitted(true);
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setIsSubmitted(false);
+          setFormData({ name: "", email: "", phone: "", message: "" });
+        }, 3000);
+      } else {
+        toast.error(data.error || "An error occurred");
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Failed to submit form");
+    }
   };
+
 
   return (
     <div className="min-h-screen ">
@@ -197,7 +226,7 @@ export default function Contact() {
           >
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-bold [#31124b] mb-6 font-arabic">معلومات التواصل</h2>
+                <h2 className="text-3xl font-bold text-[#31124b] mb-6 font-arabic">معلومات التواصل</h2>
                 <p className="text-[#31124b] mb-8 text-lg font-arabic">
                   يمكنك التواصل معنا مباشرة من خلال النموذج أو باستخدام أي من وسائل الاتصال التالية:
                 </p>
@@ -244,13 +273,13 @@ export default function Contact() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-xl mb-1 font-arabic">العنوان</h3>
-                  <p className="text-lg font-arabic">شارع الملك فهد، حي الروضة، الرياض، المملكة العربية السعودية</p>
+                  <h3 className="font-bold text-xl text-[rgb(49,18,75)] mb-1 font-arabic">العنوان</h3>
+                  <p className="text-lg font-arabic">، الزرقاء - المملكة الاردنية الهاشمية</p>
                 </div>
               </motion.div>
               
               <div className="pt-6">
-                <h3 className="font-bold text-xl mb-4 [#31124b] font-arabic">تابعنا على</h3>
+                <h3 className="font-bold text-xl mb-4 text-[#31124b] font-arabic">تابعنا على</h3>
                 <div className="flex gap-4 justify-start">
                   <motion.a 
                     href="#" 
@@ -302,7 +331,7 @@ export default function Contact() {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold [#31124b] mb-4 font-arabic">موقعنا</h2>
+            <h2 className="text-3xl font-bold text-[#31124b] mb-4 font-arabic">موقعنا</h2>
             <p className="text-[#31124b] max-w-2xl mx-auto text-lg font-arabic">
               يمكنك زيارتنا في مقر مشروع بادر لإصلاح مشاكل الحي
             </p>
@@ -314,7 +343,7 @@ export default function Contact() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#fa9e1b]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
-                <p className="mt-2 [#31124b] text-lg font-arabic">جاري تحميل الخريطة...</p>
+                <p className="mt-2 text-[#31124b] text-lg font-arabic">جاري تحميل الخريطة...</p>
               </div>
             </div>
             <Map />

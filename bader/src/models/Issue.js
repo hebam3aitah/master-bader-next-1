@@ -8,7 +8,8 @@ const IssueSchema = new mongoose.Schema({
   Images: [{ type: String }],
   ReportedAt: { type: Date, default: Date.now },
   DangerLvl: { type: String, enum: ['urgent', 'medium', 'low'], default: 'low' },
-  ProjectID: { type: Number },
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' }, // ⬅️ عدّل بدل Number
+
   // User: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
 

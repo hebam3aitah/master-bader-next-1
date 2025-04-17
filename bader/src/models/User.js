@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   // الصور: واحدة مخصصة للـ Google، والثانية لمن يسجل يدويًا
   image: { type: String }, // صورة من حساب Google
   profilePicture: { type: String, default: "" }, // يرفعها المستخدم يدويًا
+  age: { type: Number },  // الحقل الجديد
 
   address: { type: String },
   profession: { type: String },

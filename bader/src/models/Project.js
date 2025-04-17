@@ -17,6 +17,8 @@ const projectSchema = new mongoose.Schema({
       createdAt: { type: Date, default: Date.now }
     }
   ],
+  issue: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' }, // ⬅️ هذا ضروري
+
   shareCount: { type: Number, default: 0 },  // عدد المشاركات على وسائل التواصل الاجتماعي
   reportedAt: { type: Date, default: Date.now },  // تاريخ بدء المشروع بعد الموافقة
 });

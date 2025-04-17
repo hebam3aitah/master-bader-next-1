@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import { signIn } from "next-auth/react"; // ✅ تأكد من هذا السطر
 
 export default function Register() {
@@ -17,16 +17,111 @@ export default function Register() {
     phone: "",
     address: "",
   });
+  const [errors, setErrors] = useState({});
+
   const [loading, setLoading] = useState(false);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\d{10}$/;
+  const passwordRegex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "fullName":
+        if (!value.trim()) {
+          error = "الاسم مطلوب";
+        } else if (value.trim().split(" ").length < 2) {
+          error = "الاسم يجب أن يتكون من مقطعين على الأقل";
+        }
+        break;
+      case "email":
+        if (!value.includes("@")) {
+          error = "البريد يجب أن يحتوي على @";
+        } else if (!value.endsWith("@gmail.com")) {
+          error = "يجب استخدام بريد Gmail فقط";
+        } else if (!emailRegex.test(value)) {
+          error = "صيغة البريد غير صحيحة";
+        }
+        break;
+      case "password":
+        if (!passwordRegex.test(value))
+          error =
+            "كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على حرف، رقم، ورمز";
+        break;
+      case "phone":
+        if (!value) {
+          error = "رقم الهاتف مطلوب";
+        } else if (!/^\d+$/.test(value)) {
+          error = "رقم الهاتف يجب أن يحتوي على أرقام فقط";
+        } else if (!value.startsWith("07")) {
+          error = "رقم الهاتف يجب أن يبدأ بـ 07";
+        } else if (value.length < 10) {
+          error = `أدخلت ${value.length} أرقام، يجب أن يكون الرقم 10 أرقام`;
+        }
+        break;
+      case "address":
+        if (!value.trim()) error = "العنوان مطلوب";
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+  };
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "الاسم مطلوب";
+    } else if (formData.fullName.trim().split(" ").length < 2) {
+      newErrors.fullName = "الاسم يجب أن يتكون من مقطعين على الأقل";
+    }
+
+    if (!formData.email.includes("@")) {
+      newErrors.email = "البريد يجب أن يحتوي على @";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "صيغة البريد غير صحيحة";
+    }
+    if (!passwordRegex.test(formData.password))
+      newErrors.password =
+        "كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على حرف، رقم، ورمز";
+    if (!formData.phone) {
+      newErrors.phone = "رقم الهاتف مطلوب";
+    } else if (!/^\d+$/.test(formData.phone)) {
+      newErrors.phone = "رقم الهاتف يجب أن يحتوي على أرقام فقط";
+    } else if (!formData.phone.startsWith("07")) {
+      newErrors.phone = "رقم الهاتف يجب أن يبدأ بـ 07";
+    } else if (formData.phone.length !== 10) {
+      newErrors.phone = `أدخلت ${formData.phone.length} أرقام، يجب أن يكون الرقم 10 أرقام`;
+    }
+    
+
+    if (!formData.address.trim()) newErrors.address = "العنوان مطلوب";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    hasLetter: false,
+    hasNumber: false,
+    hasSymbol: false,
+    isLongEnough: false,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
+    // if (!validate()) {
+    //   setLoading(false);
+    //   return;
+    // }
+    // setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.fullName,
           email: formData.email,
@@ -42,9 +137,9 @@ export default function Register() {
         toast.error(data.message || "فشل في إنشاء الحساب");
       } else {
         toast.warn(" تحقق من بريدك الإلكتروني لإدخال رمز التحقق");
-        sessionStorage.setItem('verificationEmail', formData.email);
+        sessionStorage.setItem("verificationEmail", formData.email);
         setTimeout(() => {
-          window.location.href = '/EmailVerificationPage';
+          window.location.href = "/EmailVerificationPage";
         }, 2000);
       }
     } catch (error) {
@@ -55,11 +150,20 @@ export default function Register() {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
+    if (name === "password") {
+      setPasswordCriteria({
+        hasLetter: /[A-Za-z]/.test(value),
+        hasNumber: /\d/.test(value),
+        hasSymbol: /[!@#$%^&*]/.test(value),
+        isLongEnough: value.length >= 8,
+      });
+    }
+  }, []);
 
- 
   return (
     <div
       dir="rtl"
@@ -141,6 +245,9 @@ export default function Register() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
                 required
               />
+              {errors.fullName && (
+                <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+              )}
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"></div>
             </motion.div>
           </div>
@@ -184,62 +291,95 @@ export default function Register() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
                 required
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"></div>
             </motion.div>
           </div>
 
           <div>
-            <motion.div
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-              className="group relative"
-            >
-              <div className="flex items-center mb-1 gap-2">
-                <svg
-                  className="w-4 h-4 text-[#662480] mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  ></path>
-                </svg>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  كلمة المرور
-                </label>
-              </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="أدخل كلمة المرور"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
-                required
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"></div>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 left-0 flex items-center pl-3 pt-6"
-              >
-                {showPassword ? (
-                  <EyeOffIcon className="h-5 w-5 text-gray-500" />
-                ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-500" />
-                )}
-              </button>
-            </motion.div>
-          </div>
+  <motion.div
+    initial={{ x: -10, opacity: 0 }}
+    animate={{ x: 0, opacity: 1 }}
+    transition={{ delay: 0.3, duration: 0.3 }}
+    className="group"
+  >
+    <div className="flex items-center mb-1 gap-2">
+      <svg
+        className="w-4 h-4 text-[#662480] mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+        />
+      </svg>
+      <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        كلمة المرور
+      </label>
+    </div>
+
+    {/* حقل كلمة المرور مع زر العين */}
+    <div className="relative">
+      <input
+        type={showPassword ? "text" : "password"}
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="أدخل كلمة المرور"
+        className="w-full px-4 pr-10 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
+        required
+      />
+
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute top-1/2 -translate-y-1/2 right-3 z-10"
+      >
+        {showPassword ? (
+          <EyeOffIcon className="h-5 w-5 text-gray-500" />
+        ) : (
+          <EyeIcon className="h-5 w-5 text-gray-500" />
+        )}
+      </button>
+    </div>
+
+    {/* الرسالة التحذيرية */}
+    {errors.password &&
+      !(
+        passwordCriteria.hasLetter &&
+        passwordCriteria.hasNumber &&
+        passwordCriteria.hasSymbol &&
+        passwordCriteria.isLongEnough
+      ) && (
+        <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+      )}
+
+    {/* تحقق الشروط */}
+    {formData.password && (
+      <ul className="text-xs text-right mt-2 space-y-1">
+        <li className={passwordCriteria.hasLetter ? "text-green-600" : "text-gray-500"}>
+          {passwordCriteria.hasLetter ? "✅" : "⬜"} يحتوي على حرف
+        </li>
+        <li className={passwordCriteria.hasNumber ? "text-green-600" : "text-gray-500"}>
+          {passwordCriteria.hasNumber ? "✅" : "⬜"} يحتوي على رقم
+        </li>
+        <li className={passwordCriteria.hasSymbol ? "text-green-600" : "text-gray-500"}>
+          {passwordCriteria.hasSymbol ? "✅" : "⬜"} يحتوي على رمز (!@#$%)
+        </li>
+        <li className={passwordCriteria.isLongEnough ? "text-green-600" : "text-gray-500"}>
+          {passwordCriteria.isLongEnough ? "✅" : "⬜"} على الأقل 8 أحرف
+        </li>
+      </ul>
+    )}
+  </motion.div>
+</div>
 
           <div>
             <motion.div
@@ -279,6 +419,9 @@ export default function Register() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
                 required
               />
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"></div>
             </motion.div>
           </div>
@@ -328,6 +471,9 @@ export default function Register() {
                 rows="3"
                 required
               />
+              {errors.address && (
+                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+              )}
             </motion.div>
           </div>
 
@@ -364,7 +510,6 @@ export default function Register() {
               </span>
             ) : (
               <span> إنشاء حساب</span>
-              
             )}
             {/* {!loading && (
               <motion.span
@@ -385,44 +530,33 @@ export default function Register() {
               className="text-[#31124b] font-medium hover:text-[#fa9e1b] transition-colors"
             >
               تسجيل الدخول
+              
             </Link>
           </p>
+
           <div className="relative flex items-center justify-center">
             <hr className="w-full border-gray-300" />
             <span className="absolute bg-white px-5 text-sm mb-4 text-gray-500">
               أو سجل دخول باستخدام
             </span>
           </div>
-          {/* <motion.button
+
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-3 px-4 transition-colors hover:bg-gray-50"
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+            className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-2 px-4 transition-colors hover:bg-gray-50"
           >
             <img
               src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
               alt="Google logo"
               className="w-5 h-5 mr-2"
             />
-            <span> Google تسجيل الدخول باستخدام</span>
-          </motion.button> */}
-          <motion.button
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
-  onClick={() => signIn("google", { callbackUrl: "/" })}
-  className="mt-4 flex items-center justify-center w-full border border-gray-300 rounded-lg py-2 px-4 transition-colors hover:bg-gray-50"
->
-  <img
-    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-    alt="Google logo"
-    className="w-5 h-5 mr-2"
-  />
-  <span>Google تسجيل الدخول باستخدام</span>
-</motion.button>
+            <span>Google تسجيل الدخول باستخدام</span>
+          </motion.button>
         </div>
       </motion.div>
       <ToastContainer position="top-center" autoClose={3000} />
-
     </div>
-    
   );
 }

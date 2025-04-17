@@ -74,7 +74,7 @@ export default function EmailVerificationPage() {
     e.preventDefault();
     const otpValue = otp.join('');
     if (otpValue.length !== 4) {
-      alert('الرجاء إدخال رمز التحقق المكون من 4 أرقام');
+      toast.error('الرجاء إدخال رمز التحقق المكون من 4 أرقام');
       return;
     }
   
@@ -89,7 +89,7 @@ export default function EmailVerificationPage() {
   
       if (!res.ok) {
         setVerificationStatus(false);
-        alert(data.message || 'فشل التحقق من الرمز');
+        toast.error(data.message || 'فشل التحقق من الرمز');
       } else {
         setVerificationStatus(true);
   
@@ -97,13 +97,13 @@ export default function EmailVerificationPage() {
         setTimeout(() => {
           toast.success('🎉 تم إنشاء الحساب بنجاح! سيتم توجيهك لتسجيل الدخول...');
 ('🎉 تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول');
-          window.location.href = '/login';
+          window.location.href = '/';
         }, 3000);
       }
     } catch (err) {
       console.error('OTP Verification Error:', err);
       setVerificationStatus(false);
-      alert('حدث خطأ أثناء التحقق من الرمز');
+      toast.error('حدث خطأ أثناء التحقق من الرمز');
     }
   
   
@@ -120,7 +120,7 @@ export default function EmailVerificationPage() {
       
       // هنا يمكن إضافة منطق إعادة إرسال الرمز
       setOtp(['', '', '', '']); // إعادة تعيين حقول الإدخال
-      alert('تم إعادة إرسال رمز التحقق');
+      toast.success('تم إعادة إرسال رمز التحقق');
       
       // التركيز على الحقل الأول
       inputRefs[0].current.focus();

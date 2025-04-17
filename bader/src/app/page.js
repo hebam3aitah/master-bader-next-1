@@ -142,7 +142,7 @@ export default function Home() {
 
       {/* قسم الدعم */}
 
-      <div className="py-16 px-4 bg-gradient-to-r from-[#31124b] to-[#411866]  rounded-2xl p-8 shadow-xl border border-opacity-10  text-white">
+      <div className="py-10 px-2 bg-gradient-to-r m-20 from-[#31124b] to-[#411866]  rounded-2xl p-2 shadow-xl border border-opacity-10  text-white">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-8">كن جزءاً من التغيير</h2>
           <p className="text-center text-xl mb-12 max-w-3xl mx-auto">نحتاج إلى دعمكم لنحقق طموحاتنا في إصلاح الحي وخلق بيئة أفضل للجميع. يمكنكم المساهمة بالوقت، الخبرة، أو الدعم المادي.</p>
