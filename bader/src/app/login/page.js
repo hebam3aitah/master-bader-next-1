@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { signIn } from "next-auth/react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,11 +16,42 @@ export default function Login() {
   });
   const [loading, setLoading] = useState(false);
 
+
+
+  const emailValid = /\S+@\S+\.\S+/.test(formData.email);
+  const passwordValid = formData.password.length >=8 ;
+
+  const [errors, setErrors] = useState({ email: '', password: '' });
+
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  
+    // live validation
+    if (name === 'email') {
+      const isValid = /\S+@\S+\.\S+/.test(value);
+      setErrors((prev) => ({ ...prev, email: isValid ? '' : 'صيغة البريد الإلكتروني غير صحيحة' }));
+    }
+  
+    if (name === 'password') {
+      const isValid = value.length >= 6;
+      setErrors((prev) => ({ ...prev, password: isValid ? '' : 'كلمة المرور يجب أن تكون 8 خانات على الاقل' }));
+    }
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!emailValid) {
+      toast.error("صيغة البريد الإلكتروني غير صحيحة");
+      return;
+    }
+
+    if (!passwordValid) {
+      toast.error("كلمة المرور يجب أن تكون 8 أحرف على الأقل");
+      return;
+    }
     setLoading(true);
   
     try {
@@ -30,15 +64,15 @@ export default function Login() {
       const data = await res.json();
   
       if (!res.ok) {
-        alert(data.message || 'فشل تسجيل الدخول');
+        toast.error(data.message || 'فشل تسجيل الدخول');
       } else {
-        alert('🎉 تم تسجيل الدخول بنجاح');
+        toast.success('🎉 تم تسجيل الدخول بنجاح');
         window.location.href = '/';
  // أو أي صفحة رئيسية
       }
     } catch (error) {
       console.error('Login Error:', error);
-      alert('حدث خطأ أثناء تسجيل الدخول');
+      toast.error('حدث خطأ أثناء تسجيل الدخول');
     } finally {
       setLoading(false);
     }
@@ -47,7 +81,10 @@ export default function Login() {
    
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4">
+      <ToastContainer position="top-center" autoClose={3000} />
+
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -87,6 +124,8 @@ export default function Login() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg right-5 text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
                 required
               />
+              {errors.email && <p  dir="rtl" className="text-red-500 text-sm mt-1">{errors.email}</p>}
+
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#31124b]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -117,6 +156,8 @@ export default function Login() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-[#31124b] transition-all"
                 required
               />
+              {errors.password && <p dir="rtl" className="text-red-500 text-sm mt-1">{errors.password}</p>}
+
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#31124b]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

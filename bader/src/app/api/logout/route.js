@@ -1,8 +1,11 @@
 // app/api/logout/route.js
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
-export async function POST() {
-  cookies().delete('token'); // امسح التوكن
-  return NextResponse.json({ message: 'تم تسجيل الخروج' });
+export async function GET() {
+  return new Response(JSON.stringify({ message: 'تم تسجيل الخروج' }), {
+    status: 200,
+    headers: {
+      'Set-Cookie': 'token=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict',
+      'Content-Type': 'application/json',
+    },
+  });
 }

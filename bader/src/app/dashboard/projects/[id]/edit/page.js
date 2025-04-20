@@ -38,7 +38,6 @@ export default function EditProjectPage({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       await axios.put(`/api/projects/${projectId}`, formData);
       router.push('/dashboard/projects');
@@ -111,7 +110,10 @@ export default function EditProjectPage({ params }) {
           </select>
         </div>
 
-        <button className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded"
+        >
           حفظ التعديلات
         </button>
       </form>

@@ -21,12 +21,12 @@ export default function AdminIssuesDashboard() {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = confirm('هل أنت متأكد أنك تريد حذف هذه المشكلة؟');
+    const confirmDelete = confirm('هل تريد حذف هذه المشكلة؟');
     if (!confirmDelete) return;
 
     try {
       await axios.delete(`/api/issues/${id}`);
-      fetchIssues(); // إعادة تحميل القائمة بعد الحذف
+      fetchIssues(); // تحديث القائمة بعد الحذف
     } catch (err) {
       console.error('فشل في حذف المشكلة:', err);
     }
@@ -34,19 +34,19 @@ export default function AdminIssuesDashboard() {
 
   return (
     <div className="p-6" dir="rtl">
-      <h1 className="text-3xl font-bold mb-4">لوحة التحكم - المشاكل المبلغ عنها</h1>
+      <h1 className="text-3xl font-bold mb-6">لوحة التحكم - المشاكل المبلغ عنها</h1>
 
       {issues.length === 0 ? (
-        <p className="text-gray-600">لا توجد مشاكل حالياً</p>
+        <p className="text-gray-500">لا توجد مشاكل حالياً.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {issues.map((issue) => (
             <div key={issue._id} className="bg-white rounded-lg shadow p-4 space-y-2">
               <h2 className="text-xl font-bold">{issue.Title}</h2>
-              <p className="text-sm text-gray-600">{issue.Description}</p>
-              <p className="text-sm">الموقع: {issue.Location}</p>
-              <p className="text-sm">التصنيف: {issue.Category?.name}</p>
-              <p className="text-sm">درجة الخطورة: {issue.DangerLvl}</p>
+              <p className="text-sm text-gray-700">{issue.Description}</p>
+              <p className="text-sm">📍 الموقع: {issue.Location}</p>
+              <p className="text-sm">📂 التصنيف: {issue.Category?.name || 'غير محدد'}</p>
+              <p className="text-sm">⚠️ الخطورة: {issue.DangerLvl}</p>
 
               {issue.projectId ? (
                 <p className="text-green-600 font-semibold">

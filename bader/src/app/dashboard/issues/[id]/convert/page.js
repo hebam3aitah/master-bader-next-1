@@ -52,15 +52,14 @@ export default function ConvertIssuePage({ params }) {
     try {
       const res = await axios.post('/api/projects', {
         ...formData,
-        issue: issueId, // نربط المشروع بالمشكلة
+        issue: issueId,
       });
 
-      // بعد نجاح الإنشاء، نحدث المشكلة وربطها بالمشروع
       await axios.put(`/api/issues/${issueId}/link`, {
         projectId: res.data._id,
       });
 
-      router.push('/dashboard/issues'); // رجوع للوحة التحكم
+      router.push('/dashboard/issues');
     } catch (error) {
       console.error('فشل في تحويل المشكلة إلى مشروع:', error);
     }

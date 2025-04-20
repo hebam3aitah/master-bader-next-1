@@ -18,7 +18,9 @@ const projectSchema = new mongoose.Schema({
     }
   ],
   issue: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' }, // ⬅️ هذا ضروري
-
+  lastStatusUpdate: { type: Date, default: Date.now }, // 👈 نضيف هذا السطر
+  donations: { type: Number, default: 0 },
+  volunteers: { type: Number, default: 0 },
   shareCount: { type: Number, default: 0 },  // عدد المشاركات على وسائل التواصل الاجتماعي
   reportedAt: { type: Date, default: Date.now },  // تاريخ بدء المشروع بعد الموافقة
 });

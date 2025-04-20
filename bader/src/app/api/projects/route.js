@@ -1,10 +1,54 @@
+// ✅ API لإنشاء مشروع وربطه بمشكلة
 import { connectDB } from '@/lib/mongoose';
 import Project from '@/models/Project';
+import Issue from '@/models/Issue';
 
+export async function POST(req) {
+  try {
+    await connectDB();
+    const data = await req.json();
+
+    const {
+      title,
+      description,
+      location,
+      category,
+      images = [],
+      priority,
+      status,
+      issueId,
+    } = data;
+
+    // إنشاء المشروع
+    const project = await Project.create({
+      title,
+      description,
+      location,
+      category,
+      images,
+      priority,
+      status,
+      reportedAt: new Date(),
+    });
+
+    // ربطه بالمشكلة الأصلية إن وُجدت
+    if (issueId) {
+      await Issue.findByIdAndUpdate(issueId, {
+        ProjectID: project._id,
+      });
+    }
+
+    return Response.json(project);
+  } catch (err) {
+    console.error('فشل إنشاء المشروع:', err);
+    return new Response(JSON.stringify({ message: 'فشل في إنشاء المشروع' }), {
+      status: 500,
+    });
+  }
+}
 export async function GET(req) {
   try {
     await connectDB();
-
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
@@ -15,45 +59,11 @@ export async function GET(req) {
 
     const projects = await Project.find(filter)
       .populate('category', 'name')
-      .populate('likes', 'name')
-      .populate('comments.user', 'name');
+      .sort({ reportedAt: -1 });
 
     return Response.json(projects);
   } catch (error) {
     console.error(error);
     return new Response('خطأ في تحميل المشاريع', { status: 500 });
-  }
-}
-
-export async function POST(req) {
-  try {
-    await connectDB();
-
-    const body = await req.json();
-
-    // تحقق مبدئي من البيانات المطلوبة
-    if (!body.title || !body.description || !body.category) {
-      return new Response('البيانات الأساسية ناقصة', { status: 400 });
-    }
-
-    const newProject = new Project({
-      title: body.title,
-      description: body.description,
-      location: body.location || '',
-      category: body.category,
-      images: body.images || [],
-      status: body.status || 'pending',
-      priority: body.priority || 'medium',
-      likes: [],
-      comments: [],
-      shareCount: 0,
-    });
-
-    await newProject.save();
-
-    return Response.json(newProject, { status: 201 });
-  } catch (error) {
-    console.error('خطأ في إضافة المشروع:', error);
-    return new Response('فشل في إضافة المشروع', { status: 500 });
   }
 }
