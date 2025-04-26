@@ -14,7 +14,7 @@ const uploadImageToCloudinary = async (file) => {
   formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
 
   const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
-    method: 'POST',
+    method: 'POST',ؤي
     body: formData,
   });
 
@@ -131,7 +131,7 @@ export default function ReportProblemPage() {
   
 useEffect(() => {
   if (submitted && successRef.current) {
-    successRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    successRef.current.scrollIntoView({ behavior: 'auto', block: 'start' });
   }
 }, [submitted]);
 
@@ -214,7 +214,7 @@ useEffect(() => {
                       phone: userData?.phone || '',
                     });
                     setTimeout(() => {
-                      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      formRef.current?.scrollIntoView({ behavior: 'auto', block:'start' });
                     }, 100);
                   }}
                   className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300"

@@ -69,7 +69,7 @@ export async function GET(req) {
     await connectDB();
     const user = await User.findById(decoded.userId);
     if (!user) return new Response(JSON.stringify({ message: 'المستخدم غير موجود' }), { status: 404 });
-    console.log("🔥 token:", req.cookies.get('token')?.value);
+    // console.log("🔥 token:", req.cookies.get('token')?.value);
 
     return Response.json({
       name: user.name,

@@ -148,7 +148,7 @@ export default function Home() {
           <p className="text-center text-xl mb-12 max-w-3xl mx-auto">نحتاج إلى دعمكم لنحقق طموحاتنا في إصلاح الحي وخلق بيئة أفضل للجميع. يمكنكم المساهمة بالوقت، الخبرة، أو الدعم المادي.</p>
           
           <div className="text-center">
-            <Link href="/support" className="bg-[#fa9e1b] text-[#31124b] hover:bg-white px-8 py-4 rounded-lg transition-colors font-bold text-xl inline-block">
+            <Link href="/supportFile" className="bg-[#fa9e1b] text-[#31124b] hover:bg-white px-8 py-4 rounded-lg transition-colors font-bold text-xl inline-block">
               كن داعماً الآن
             </Link>
           </div>

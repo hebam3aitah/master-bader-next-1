@@ -1,21 +1,26 @@
-const mongoose = require('mongoose');
+ const mongoose = require('mongoose');
 
 const IssueSchema = new mongoose.Schema({
-  Title: { type: String }, // ممكن تخليه "problemType" بدلًا من "Title" لو بتحب الوضوح
-  Description: { type: String },
-  Location: { type: String },
-  Category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }, // إذا رح تستخدم تصنيفات جاهزة
-  Images: [{ type: String }],
-  ReportedAt: { type: Date, default: Date.now },
-  DangerLvl: { type: String, enum: ['high', 'medium', 'low'], default: 'medium' }, // ✅ حدث enum
-  reporterName: { type: String, required: true }, // ⬅️ جديد
-  phone: { type: String, required: true },        // ⬅️ جديد
+  problemType: { type: String },
+  description: { type: String },
+  location: { type: String },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+  images: [{ type: String }],
+  reportedAt: { type: Date, default: Date.now },
+  severityLevel: { type: String, enum: ['high', 'medium', 'low'], default: 'medium' },
+  reporterName: { type: String, required: true },
+  phone: { type: String, required: true },
+
   status: {
     type: String,
-    enum: ['pending', 'in_progress', 'resolved'],
+    enum: ['pending', 'approved', 'rejected'],
     default: 'pending',
-  }, // ⬅️ لحالة البلاغ
-  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' }, // إذا تم ربطه بمشروع
-});
+  },
+  reviewedByAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+}, { timestamps: true });
 
 module.exports = mongoose.models.Issue || mongoose.model('Issue', IssueSchema);
