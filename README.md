@@ -22,7 +22,8 @@ Bader is an innovative online platform designed to improve neighborhoods by enab
 
 - **Figma Design**: [Figma Link](https://www.figma.com/design/zlEOqGtgi7P6Laq5HWOQcy/Untitled?node-id=0-1&t=L0WTFg09gR5qHlQS-1)
 - **Trello Board**: [Trello Link](https://trello.com/invite/b/67f1aca8e561ad759a1b8aed/ATTIa01788708b30bff494dc0074bddd83025ACF6B83/maser)
-
+- **brife Board** : [brife Link](https://docs.google.com/document/d/1Aj-p0FxrcPb4RMOniMr8PTCdbt_jbfmfJvJfxf81NOU/edit?tab=t.0)
+ - **Decumtion Board** :[Decumtion Board](https://docs.google.com/document/d/1f0IR_ay0JOgETGmxIpUSTr6G_Fi9Kvi2H88FOilfPx0/edit?usp=sharing)
 ## Installation
 
 1. Clone the repository:
