@@ -80,8 +80,12 @@ export default function DonationSection({ projectId }) {
 
       <Link href={`/project/${projectId}/donate`}>
         <div className="block w-full bg-[#e08c18] text-white text-center py-3 rounded-lg font-bold mb-4 hover:bg-opacity-90 transition-colors cursor-pointer">
+          
           <DollarSign className="inline-block w-5 h-5 ml-2" />
+
           تبرع الآن
+
+
         </div>
       </Link>
 

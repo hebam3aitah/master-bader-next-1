@@ -1,11 +1,10 @@
-// pages/donate.js
 'use client';
 
 import { useState } from 'react';
 import Head from 'next/head';
 import { FaHandHoldingHeart, FaMoneyBillWave, FaUser, FaEnvelope, FaPhone, FaCreditCard, FaCalendarAlt, FaLock } from 'react-icons/fa';
 
-export default function DonatePage() {
+export default function DonatePage({ projectId = null, organizationId = null }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,7 +17,7 @@ export default function DonatePage() {
     cvv: '',
     message: ''
   });
-  
+
   const [step, setStep] = useState(1);
 
   const handleChange = (e) => {
@@ -29,30 +28,58 @@ export default function DonatePage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('تم تقديم تبرع:', formData);
-    // هنا يمكنك إضافة الكود الخاص بإرسال البيانات إلى الخادم
-    alert('شكراً لتبرعك الكريم! تم استلام التبرع بنجاح.');
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      amount: '',
-      paymentMethod: 'credit',
-      cardName: '',
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-      message: ''
-    });
-    setStep(1);
+
+    try {
+      // 👇 جلب بيانات المستخدم الحالي
+      const userRes = await fetch('/api/current-user');
+      const userData = await userRes.json();
+      const userId = userData._id;
+
+      // 👇 إرسال البيانات إلى API التبرعات
+      const res = await fetch('/api/donations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          donorId: userId,
+          amount: Number(formData.amount),
+          isGeneral: !projectId && !organizationId,
+          projectId,
+          organizationId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          amount: '',
+          paymentMethod: 'credit',
+          cardName: '',
+          cardNumber: '',
+          expiryDate: '',
+          cvv: '',
+          message: '',
+        });
+        setStep(1);
+      } else {
+        alert(data.message || 'فشل إرسال التبرع');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء إرسال التبرع');
+    }
   };
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
-
   const donationAmounts = [50, 100, 200, 500, 1000];
+
 
   return (
     <div dir="rtl" className="min-h-screen ">
@@ -436,3 +463,4 @@ export default function DonatePage() {
     </div>
   );
 }
+//<DonatePage projectId="665e46d9b90c2e84d22f9331" organizationId={null} />

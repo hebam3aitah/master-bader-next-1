@@ -1,13 +1,19 @@
+
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import ContactMessage from "@/models/ContactMessage";
-import { connectDB} from "@/lib/connectDb";  
 
 export async function POST(request) {
   const body = await request.json();
 
-  // connect to MongoDB
-  if (!mongoose.connections[0].readyState) {
+  if (!body.name || !body.email || !body.message) {
+    return NextResponse.json(
+      { success: false, error: "الاسم والبريد والرسالة مطلوبة." },
+      { status: 400 }
+    );
+  }
+
+  if (mongoose.connection.readyState !== 1) {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -18,10 +24,11 @@ export async function POST(request) {
     const newMessage = new ContactMessage(body);
     await newMessage.save();
     return NextResponse.json(
-      { success: true, message: "Message sent successfully!" },
+      { success: true, message: "تم إرسال الرسالة بنجاح!" },
       { status: 201 }
     );
   } catch (error) {
+    console.error("Error saving message:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

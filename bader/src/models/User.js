@@ -3,21 +3,27 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String }, // غير مطلوب لحسابات Google
+  password: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return this.provider === 'google' || (v && v.length > 0);
+      },
+      message: 'كلمة المرور مطلوبة للحسابات اليدوية',
+    },
+  },
+  provider: { type: String, enum: ['local', 'google'], default: 'local' },
   role: { type: String, enum: ["user", "admin", "volunteer"], default: "user" },
-
-  // الصور: واحدة مخصصة للـ Google، والثانية لمن يسجل يدويًا
-  image: { type: String }, // صورة من حساب Google
-  profilePicture: { type: String, default: "" }, // يرفعها المستخدم يدويًا
-  age: { type: Number },  // الحقل الجديد
-
+  image: { type: String },
+  profilePicture: { type: String, default: "" },
+  age: { type: Number },
   address: { type: String },
   profession: { type: String },
   experience: { type: String },
   birthDate: { type: Date },
   IsConfirmed: { type: Boolean, default: false },
   registrationDate: { type: Date, default: Date.now },
-  otp: { type: String }, // رمز التحقق
-});
+  otp: { type: String },
+}, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

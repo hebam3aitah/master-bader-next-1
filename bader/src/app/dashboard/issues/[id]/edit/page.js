@@ -9,7 +9,7 @@ export default function EditIssuePage({ params }) {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ Title: '', Description: '', Location: '', DangerLvl: '' });
 
-  useEffect(() => {
+  useEffect(() => {بد
     const fetchIssue = async () => {
       try {
         const res = await axios.get(`/api/issues/${params.id}`);

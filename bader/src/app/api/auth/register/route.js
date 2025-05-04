@@ -150,7 +150,7 @@ export async function POST(req) {
     });
 
     await user.save();
-
+   
     // ✅ إرسال الإيميل بشكل HTML أنيق
     const transporter = nodemailer.createTransport({
       service: 'gmail',
