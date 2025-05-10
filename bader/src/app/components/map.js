@@ -195,3 +195,83 @@ export default function Map() {
     </>
   );
 }
+// 'use client';
+// import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+// import L from 'leaflet';
+// import 'leaflet/dist/leaflet.css';
+// import { useEffect, useState } from 'react';
+
+// // إنشاء أيقونات مخصصة
+// const createCustomIcon = (color) => {
+//   return L.divIcon({
+//     html: `<div style="background-color:${color}; width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 0 5px rgba(0,0,0,0.3);"></div>`,
+//     className: '',
+//     iconSize: [24, 24]
+//   });
+// };
+
+// const statusColors = {
+//   completed: '#4CAF50',
+//   'in-progress': '#2196F3',
+//   pending: '#9C27B0'
+// };
+
+// function ProjectMarkers({ projects }) {
+//   const map = useMap();
+
+//   useEffect(() => {
+//     if (projects.length > 0) {
+//       const group = L.featureGroup();
+//       projects.forEach(project => {
+//         if (project.coordinates?.coordinates) {
+//           const marker = L.marker(
+//             [project.coordinates.coordinates[1], project.coordinates.coordinates[0]],
+//             { icon: createCustomIcon(statusColors[project.status]) }
+//           ).bindPopup(`
+//             <div style="direction:rtl; text-align:right; width:200px;">
+//               <b>${project.title}</b><br>
+//               <span style="color:${statusColors[project.status]}">
+//                 ${project.status === 'completed' ? 'مكتمل' : 
+//                  project.status === 'in-progress' ? 'قيد التنفيذ' : 'قيد الانتظار'}
+//               </span><br>
+//               ${project.description}
+//             </div>
+//           `);
+//           group.addLayer(marker);
+//         }
+//       });
+//       map.addLayer(group);
+//       map.fitBounds(group.getBounds());
+//     }
+//   }, [projects, map]);
+
+//   return null;
+// }
+
+// export default function Map({ projects }) {
+//   const [isClient, setIsClient] = useState(false);
+
+//   useEffect(() => {
+//     setIsClient(true);
+//   }, []);
+
+//   if (!isClient || typeof window === 'undefined') {
+//     return <div>جارٍ تحميل الخريطة...</div>;
+//   }
+
+//   return (
+//     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+//       <MapContainer
+//         center={[24.7136, 46.6753]}
+//         zoom={13}
+//         style={{ height: '100%', width: '100%' }}
+//       >
+//         <TileLayer
+//           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+//           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//         />
+//         <ProjectMarkers projects={projects} />
+//       </MapContainer>
+//     </div>
+//   );
+// }

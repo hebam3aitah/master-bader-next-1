@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   profilePicture: { type: String, default: "" },
   age: { type: Number },
   address: { type: String },
+  phone: { type: String },
   profession: { type: String },
   experience: { type: String },
   birthDate: { type: Date },

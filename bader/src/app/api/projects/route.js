@@ -1,39 +1,4 @@
 
-// import { connectDB } from '@/lib/mongoose';
-// import Project from '@/models/Project';
-// import Category from '@/models/Category';
-
-// import { NextResponse } from 'next/server';
-
-// export async function GET(req) {
-//   try {
-//     await connectDB();
-//     const { searchParams } = new URL(req.url);
-
-//     const status = searchParams.get('status');
-//     const page = parseInt(searchParams.get('page')) || 1;
-//     const limit = parseInt(searchParams.get('limit')) || 8;
-//     const skip = (page - 1) * limit;
-
-//     let filter = {};
-//     if (status && ['pending', 'in-progress', 'completed', 'قيد التنفيذ', 'مكتمل'].includes(status)) {
-//       filter.status = status;
-//     }
-
-//     const projects = await Project.find(filter)
-//       .populate('category', 'name')
-//       .sort({ reportedAt: -1 })
-//       .skip(skip)
-//       .limit(limit);
-
-//     const totalProjects = await Project.countDocuments(filter);
-
-//     return NextResponse.json({ projects, totalProjects });
-//   } catch (error) {
-//     console.error('خطأ أثناء تحميل المشاريع:', error.message, error.stack);
-//     return NextResponse.json({ message: 'خطأ في تحميل المشاريع', error: error.message }, { status: 500 });
-//   }
-// }
 import { connectDB } from '@/lib/mongoose';
 import Project from '@/models/Project';
 import Category from '@/models/Category';

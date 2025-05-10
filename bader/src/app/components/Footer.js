@@ -73,27 +73,12 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <div className="mt-6 ">
-            <h3 className="text-xl font-bold mb-2 text-[#fa9e1b]">النشرة الإخبارية</h3>
-            <form className="flex mt-4 border-2 border-circel">
-              <input 
-                type="email" 
-                placeholder="البريد الإلكتروني" 
-                className="px-4 py-2 w-full rounded-r-lg focus:outline-none   text-amber-50" 
-              />
-              <button 
-                type="submit" 
-                className="bg-[#fa9e1b] hover:bg-[#662480] text-white px-4 py-2 rounded-l-lg transition-colors"
-              >
-                اشتراك
-              </button>
-            </form>
-          </div>
+         
         </div>
       </div>
       
       <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-300">
-        <p>© {new Date().getFullYear()} مبادرة إصلاح الحي. جميع الحقوق محفوظة.</p>
+        <p>© {new Date().getFullYear()} مبادرة بادر . جميع الحقوق محفوظة.</p>
       </div>
     </div>
     

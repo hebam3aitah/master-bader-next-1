@@ -54,6 +54,7 @@ export async function GET(req) {
       name: token.name,
       email: token.email,
       phone: token.phone || 'غير متوفر',
+      address: token.address || 'غير متوفر',
       provider: 'google',
     });
   }
@@ -67,7 +68,7 @@ export async function GET(req) {
   try {
     const decoded = jwt.verify(rawToken, process.env.JWT_SECRET);
     await connectDB();
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId).select('name email phone address');
     if (!user) return new Response(JSON.stringify({ message: 'المستخدم غير موجود' }), { status: 404 });
     // console.log("🔥 token:", req.cookies.get('token')?.value);
 
@@ -75,10 +76,13 @@ export async function GET(req) {
       name: user.name,
       email: user.email,
       phone: user.phone || '',
+      address:  user.address|| '',
       provider: 'credentials',
       
     });
   } catch (err) {
+    console.error('❌ Error in /api/current-user:', err);
+
     return new Response(JSON.stringify({ message: 'توكن غير صالح' }), { status: 401 });
   }
 }

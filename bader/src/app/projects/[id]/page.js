@@ -26,41 +26,20 @@ export default function ProjectDetails() {
   
   useEffect(() => {
     if (!id) return;
-    
     const fetchProjectData = async () => {
       try {
         setLoading(true);
-        // في التطبيق الحقيقي، ستقوم بالاتصال بـ API الفعلي
-        // هذه مجرد بيانات وهمية للعرض
-        const projectData = {
-          id: id,
-          title: "مشروع المساعدة الإنسانية",
-          description: "هذا المشروع يهدف لمساعدة المحتاجين في المناطق المتضررة. نعمل على توفير المأوى والغذاء والرعاية الصحية للأشخاص المتضررين من الكوارث الطبيعية والنزاعات.",
-          mainImage: "/api/placeholder/800/400",
-          images: [
-            "/api/placeholder/800/400",
-            "/api/placeholder/800/400",
-            "/api/placeholder/800/400",
-            "/api/placeholder/800/400"
-          ],
-          likes: 234,
-          comments: 45,
-          volunteers: 45,
-          donations: 12500,
-          relatedProjects: [
-            { id: 1, title: "مشروع التعليم للجميع", image: "/api/placeholder/400/200" },
-            { id: 2, title: "مشروع الدعم النفسي", image: "/api/placeholder/400/200" },
-            { id: 3, title: "مشروع الرعاية الصحية", image: "/api/placeholder/400/200" }
-          ]
-        };
-        
-        setProject(projectData);
+        const response = await axios.get(`/api/projects/${id}`);
+        setProject(response.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching project data:", error);
         setLoading(false);
       }
     };
+    
+    
+        
     
     fetchProjectData();
   }, [id]);
@@ -131,12 +110,12 @@ export default function ProjectDetails() {
                     className={`flex items-center space-x-2 space-x-reverse ${liked ? 'text-red-500' : 'text-gray-500'}`}
                   >
                     <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-                    <span>{project.likes}</span>
-                  </button>
+                    <span>{project.likes.length}</span>
+                    </button>
                   
                   <button className="flex items-center space-x-2 space-x-reverse text-gray-500">
                     <MessageCircle className="w-5 h-5" />
-                    <span>{project.comments}</span>
+                    <span>{project.comments.length}</span>
                   </button>
                   
                   <div className="relative">
